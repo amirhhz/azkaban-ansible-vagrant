@@ -1,0 +1,45 @@
+---
+- hosts: all
+  sudo: True
+  user: vagrant
+  vars:
+    azkaban_db: azkaban
+
+  tasks:
+    - name: update apt cache
+      apt: update_cache=yes
+
+    - name: ensure ntpd is at the latest version
+      apt: pkg=ntp state=latest
+      notify:
+        - restart ntpd
+
+    - name: Install packages
+      apt: pkg={{ item }} state=latest
+      with_items:
+        - mysql-server
+        - mysql-client
+        - python-mysqldb
+        - vim
+
+    - name: Ensure azkaban DB is present
+      mysql_db: name={{ azkaban_db }} state=present
+
+    - name: Ensure azkaban DB user is present with correct privileges
+      mysql_user: name=azkaban password=azkaban
+                  priv={{ azkaban_db }}.*:SELECT,INSERT,UPDATE,DELETE,GRANT
+                  state=present
+
+    - name: Use custom my.conf with suitable settings
+      copy:
+         src=files/etc/mysql/my.cnf dest=/etc/mysql/my.cnf
+         owner=root group=root
+         mode=0644
+      notify: restart mysql
+
+  handlers:
+    - name: restart ntpd
+      service: name=ntpd state=restarted
+
+    - name: restart mysql
+      service: name=mysql state=restarted
