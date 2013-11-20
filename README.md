@@ -12,5 +12,5 @@ And the following are equivalent ways of provisioning the whole playbook on a ru
 
     vagrant provision [--provision-with=ansible]
 
-    ansible-playbook --user vagrant --sudo --private-key=~/.vagrant.d/insecure_private_key \
+    ansible-playbook --user vagrant --private-key=~/.vagrant.d/insecure_private_key \
     -i vagrant_ansible_inventory_default azkaban-test.yml
