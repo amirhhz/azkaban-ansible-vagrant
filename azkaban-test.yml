@@ -21,6 +21,7 @@
         - mysql-client
         - python-mysqldb
         - vim
+        - openjdk-7-jdk
 
     - name: Ensure azkaban DB is present
       mysql_db: name={{ azkaban_db }} state=present
